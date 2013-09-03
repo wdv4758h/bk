@@ -10,7 +10,6 @@ class Backups:
         makedirs('backups - %s' % file_name,exist_ok=True)
 
     def BackupFile(file_name, stime):
-        stime = int(stime) if stime.isdecimal() else 20     #secs
         Backups.checkdir(file_name)
 
         pwd = getcwd()
