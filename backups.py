@@ -3,16 +3,24 @@
 
 import os.path, time, shutil
 from os import makedirs, getcwd, chdir
+import re
 
 class Backups:
 
     def checkdir(file_name):
         makedirs('backups - %s' % file_name,exist_ok=True)
 
-    def BackupFile(file_name, stime):
-        Backups.checkdir(file_name)
+    def BackupFile(file_path, stime):
+        split = re.search(r'^(.*/)([^/]+)$', file_path)
+        if split:
+            file_dir = split.group(1)
+            file_name = split.group(2)
+        else:
+            #for current directory's files
+            file_dir = getcwd()
+            file_name = file_path
 
-        pwd = getcwd()
+        Backups.checkdir(file_name)
 
         #change directory to backup
         try:
@@ -30,11 +38,11 @@ class Backups:
             pass
 
         try:
-            while(True):
-                modify_time = os.path.getmtime('%s/%s' % (pwd, file_name))
+            while True:
+                modify_time = os.path.getmtime('%s/%s' % (file_dir, file_name))
                 if modify_time != pre_modify_time:
                     try:
-                        shutil.copy('%s/%s' % (pwd, file_name), '%s - %s' % (file_name, time.ctime(modify_time)))
+                        shutil.copy('%s/%s' % (file_dir, file_name), '%s - %s' % (file_name, time.ctime(modify_time)))
                     except Exception:
                         print('Copy file error !')
                         pass
