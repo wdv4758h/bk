@@ -7,12 +7,14 @@ import os.path, time, shutil
 import re
 
 class Backups:
-    processList = {}
 
-    def checkdir(file_name):
+    def __init__(self):
+        self.processList = {}
+
+    def checkdir(self, file_name):
         makedirs('backups - %s' % file_name,exist_ok=True)
 
-    def BackupFile(file_path, stime):
+    def BackupFile(self, file_path, stime):
         split = re.search(r'^(.*/)([^/]+)$', file_path)
         if split:
             file_dir = split.group(1)
@@ -22,7 +24,7 @@ class Backups:
             file_dir = getcwd()
             file_name = file_path
 
-        Backups.checkdir(file_name)
+        self.checkdir(file_name)
 
         #change directory to backup
         try:
@@ -61,15 +63,15 @@ class Backups:
             print('exit program')
             pass
 
-    def mBackup(file_path, stime):
-        Backups.processList[file_path] = Process(target=Backups.BackupFile, args=(file_path, stime))
-        Backups.processList[file_path].start()
+    def mBackup(self, file_path, stime):
+        self.processList[file_path] = Process(target=self.BackupFile, args=(file_path, stime))
+        self.processList[file_path].start()
 
-    def mStop(file_path):
-        if file_path in Backups.processList.keys():
-            Backups.processList[file_path].terminate()
-            Backups.processList[file_path].join()
-            Backups.processList.pop(file_path)
+    def mStop(self, file_path):
+        if file_path in self.processList.keys():
+            self.processList[file_path].terminate()
+            self.processList[file_path].join()
+            self.processList.pop(file_path)
             return 0
         else:
             print("process not found")
@@ -88,4 +90,5 @@ if __name__ == "__main__":
     else:
         print("missing backup file")
         exit()
-    Backups.BackupFile(file_name, stime)
+    bk = Backups()
+    bk.BackupFile(file_name, stime)
