@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os.path, time, shutil
 from os import makedirs, getcwd, chdir
+from multiprocessing import Process
+import os.path, time, shutil
 import re
 
 class Backups:
+    processList = {}
 
     def checkdir(file_name):
         makedirs('backups - %s' % file_name,exist_ok=True)
@@ -58,6 +60,21 @@ class Backups:
         except:
             print('exit program')
             pass
+
+    def mBackup(file_path, stime):
+        Backups.processList[file_path] = Process(target=Backups.BackupFile, args=(file_path, stime))
+        Backups.processList[file_path].start()
+
+    def mStop(file_path):
+        if file_path in Backups.processList.keys():
+            Backups.processList[file_path].terminate()
+            Backups.processList[file_path].join()
+            Backups.processList.pop(file_path)
+            return 0
+        else:
+            print("process not found")
+            return 1
+
 
 if __name__ == "__main__":
     import sys
